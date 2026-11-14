@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Você me ama?</title>
+<style>
+  :root {
+    --pink: #ff2d78;
+    --pink-dim: #c41a5a;
+    --pink-bright: #ff6eb4;
+    --bg: #000;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #000;
+    min-height: 100vh;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* ===== TELA PERGUNTA ===== */
+  #tela-pergunta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 2rem;
+    gap: 2.5rem;
+    text-align: center;
+  }
+  .titulo {
+    color: var(--pink);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px var(--pink), 0 0 40px var(--pink-dim);
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .subtitulo {
+    color: var(--pink-bright);
+    font-size: 1rem;
+    opacity: 0.8;
+    letter-spacing: 1px;
+  }
+  @keyframes pulse {
+    0%, 100% { text-shadow: 0 0 20px var(--pink), 0 0 40px var(--pink-dim); }
+    50% { text-shadow: 0 0 30px var(--pink), 0 0 60px var(--pink), 0 0 80px var(--pink-dim); }
+  }
+
+  .btns {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .btn-sim {
+    background: var(--pink);
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 42px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    box-shadow: 0 0 20px var(--pink), 0 0 40px var(--pink-dim);
+    transition: transform 0.1s, box-shadow 0.2s;
+  }
+  .btn-sim:hover {
+    transform: scale(1.07);
+    box-shadow: 0 0 30px var(--pink), 0 0 60px var(--pink);
+  }
+  .btn-nao {
+    background: transparent;
+    color: #888;
+    border: 1px solid #444;
+    border-radius: 50px;
+    padding: 14px 42px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    position: static;
+    white-space: nowrap;
+    transition: transform 0.1s;
+    z-index: 100;
+  }
+
+  /* ===== TELA CORAÇÃO ===== */
+  #tela-coracao {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 1rem;
+    text-align: center;
+  }
+  #tela-coracao.show { display: flex; }
+
+  #canvas-coracao {
+    position: relative;
+    width: 340px;
+    height: 320px;
+    margin: 0 auto;
+  }
+
+  .palavra {
+    position: absolute;
+    color: var(--pink);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    opacity: 0;
+    transform: scale(0.3) translateY(-10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    text-shadow: 0 0 8px var(--pink), 0 0 16px var(--pink-dim);
+    pointer-events: none;
+    font-family: Arial, sans-serif;
+  }
+  .palavra.visivel {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  .palavra.brilha {
+    animation: brilhoTexto 1.5s ease-in-out infinite;
+  }
+  @keyframes brilhoTexto {
+    0%, 100% { text-shadow: 0 0 6px var(--pink); color: var(--pink); }
+    50% { text-shadow: 0 0 16px var(--pink-bright), 0 0 30px var(--pink); color: var(--pink-bright); }
+  }
+
+  .msg-final {
+    color: var(--pink);
+    font-size: 1.3rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-shadow: 0 0 20px var(--pink), 0 0 40px var(--pink-dim);
+    margin-top: 1.5rem;
+    opacity: 0;
+    transition: opacity 1s ease;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .msg-final.show { opacity: 1; }
+
+  .btn-reiniciar {
+    background: transparent;
+    color: var(--pink);
+    border: 1px solid var(--pink);
+    border-radius: 50px;
+    padding: 10px 30px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 1.5rem;
+    opacity: 0;
+    transition: opacity 0.5s ease, box-shadow 0.2s;
+  }
+  .btn-reiniciar.show { opacity: 1; }
+  .btn-reiniciar:hover { box-shadow: 0 0 16px var(--pink); }
+</style>
+</head>
+<body>
+
+<!-- TELA 1: PERGUNTA -->
+<div id="tela-pergunta">
+  <div>
+    <div class="titulo">💗 Você me ama? 💗</div>
+    <div class="subtitulo" style="margin-top:0.5rem">pensa bem antes de responder...</div>
+  </div>
+  <div class="btns">
+    <button class="btn-sim" onclick="clicouSim()">SIM 💖</button>
+    <button class="btn-nao" id="btn-nao" onclick="clicouNao()">NÃO 🙅</button>
+  </div>
+</div>
+
+<!-- TELA 2: CORAÇÃO -->
+<div id="tela-coracao">
+  <div id="canvas-coracao"></div>
+  <div class="msg-final" id="msg-final">EU TE AMO 💗</div>
+  <button class="btn-reiniciar" id="btn-reiniciar" onclick="reiniciar()">RECOMEÇAR</button>
+</div>
+
+<script>
+// ---- BOTÃO NÃO FOGE ----
+let clicks = 0;
+const posicoes = [
+  [60,420],[290,70],[15,210],[310,320],[110,370],[240,140],
+  [25,90],[320,420],[160,470],[210,40],[45,300],[330,230],
+  [80,150],[265,390],[10,430],[300,160],[140,80],[200,460],
+  [50,350],[280,250],[100,30],[340,300],[170,420],[220,120]
+];
+const textosNao = ['NÃO 🙅','Tenho certeza!','Vai não!','Para! 😤','Nunca!','Sai fora!','Para de clicar!','Não te amo!','...mesmo não!','NÃOOOO!'];
+
+function clicouNao() {
+  clicks++;
+  const btn = document.getElementById('btn-nao');
+  btn.style.position = 'fixed';
+  btn.style.margin = '0';
+  const idx = (clicks - 1) % posicoes.length;
+  btn.style.left = posicoes[idx][0] + 'px';
+  btn.style.top  = posicoes[idx][1] + 'px';
+  const fs = Math.max(10, 17 - clicks * 0.6);
+  btn.style.fontSize = fs + 'px';
+  const py = Math.max(5, 14 - clicks);
+  const px = Math.max(12, 36 - clicks * 2);
+  btn.style.padding = `${py}px ${px}px`;
+  btn.textContent = textosNao[Math.min(clicks, textosNao.length - 1)];
+}
+
+// ---- CLICOU SIM ----
+function clicouSim() {
+  document.getElementById('tela-pergunta').style.display = 'none';
+  const tela = document.getElementById('tela-coracao');
+  tela.classList.add('show');
+  gerarCoracao();
+}
+
+// ---- GERA PONTOS DO CORAÇÃO ----
+function gerarPontosCoracao(n) {
+  const pontos = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * 2 * Math.PI;
+    // fórmula paramétrica do coração
+    const x = 16 * Math.pow(Math.sin(t), 3);
+    const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+    pontos.push({ x, y });
+  }
+  return pontos;
+}
+
+function gerarCoracao() {
+  const container = document.getElementById('canvas-coracao');
+  container.innerHTML = '';
+
+  const W = 340, H = 320;
+  const cx = W / 2, cy = H / 2 - 10;
+  const escala = 10.5;
+
+  // Pontos na borda + pontos internos
+  const bordaPontos = gerarPontosCoracao(90);
+  
+  // Preenchimento interno com grid
+  const internos = [];
+  for (let gx = -16; gx <= 16; gx += 1.8) {
+    for (let gy = -14; gy <= 13; gy += 1.8) {
+      const t = Math.atan2(gx, -gy);
+      const bx = 16 * Math.pow(Math.sin(t), 3);
+      const by = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
+      // verifica se ponto está dentro do coração
+      if (dentroCoracao(gx, gy)) {
+        internos.push({ x: gx, y: gy });
+      }
+    }
+  }
+
+  function dentroCoracao(px, py) {
+    // teste simples: ponto dentro da curva paramétrica
+    // usamos a equação implícita aproximada
+    const v = Math.pow(px*px + py*py - 1, 3) - px*px * py*py*py;
+    // escalonado para o nosso range
+    const sx = px / 16, sy = py / 13;
+    const val = Math.pow(sx*sx + sy*sy - 1, 3) - sx*sx * Math.pow(sy, 3) * 0.5;
+    return val <= 0.05;
+  }
+
+  // Todos os pontos
+  const todos = [...bordaPontos.map(p => ({...p, borda: true})),
+                 ...internos.map(p => ({...p, borda: false}))];
+
+  // Embaralha internos para aparecer aleatório
+  const internoisEmbaralhados = internos.sort(() => Math.random() - 0.5);
+  const todosOrdenados = [...bordaPontos.map(p => ({...p, borda: true})),
+                          ...internoisEmbaralhados.map(p => ({...p, borda: false}))];
+
+  // Cria elementos
+  const elementos = todosOrdenados.map((p, i) => {
+    const el = document.createElement('div');
+    el.className = 'palavra';
+    el.textContent = 'EU TE AMO';
+
+    const px = cx + p.x * escala - 30;
+    const py = cy + p.y * escala - 6;
+    el.style.left = px + 'px';
+    el.style.top  = py + 'px';
+
+    // Bordas um pouco maiores
+    if (p.borda) {
+      el.style.fontSize = '12px';
+      el.style.color = '#ff6eb4';
+    } else {
+      const r = Math.random();
+      if (r < 0.15) {
+        el.style.color = '#ff6eb4';
+        el.style.fontSize = '12px';
+      } else if (r < 0.4) {
+        el.style.color = '#c41a5a';
+        el.style.fontSize = '10px';
+      } else {
+        el.style.fontSize = '11px';
+      }
+    }
+
+    container.appendChild(el);
+    return el;
+  });
+
+  // Anima aparecimento sequencial
+  elementos.forEach((el, i) => {
+    setTimeout(() => {
+      el.classList.add('visivel');
+      // alguns ficam piscando
+      if (Math.random() < 0.2) {
+        setTimeout(() => el.classList.add('brilha'), 500);
+      }
+    }, i * 18 + Math.random() * 30);
+  });
+
+  // Mensagem final
+  const totalMs = elementos.length * 18 + 600;
+  setTimeout(() => {
+    document.getElementById('msg-final').classList.add('show');
+  }, totalMs);
+  setTimeout(() => {
+    document.getElementById('btn-reiniciar').classList.add('show');
+  }, totalMs + 400);
+
+  // Loop: após tudo aparecer, faz ondas de brilho
+  setTimeout(() => {
+    setInterval(() => ondaBrilho(elementos), 2000);
+  }, totalMs + 800);
+}
+
+function ondaBrilho(els) {
+  // Seleciona ~15% aleatórios para piscar em sequência
+  const selecionados = els.filter(() => Math.random() < 0.15);
+  selecionados.forEach((el, i) => {
+    setTimeout(() => {
+      el.style.transition = 'color 0.2s, text-shadow 0.2s';
+      el.style.color = '#fff';
+      el.style.textShadow = '0 0 12px #fff, 0 0 24px var(--pink-bright)';
+      setTimeout(() => {
+        el.style.color = '';
+        el.style.textShadow = '';
+      }, 300);
+    }, i * 40);
+  });
+}
+
+function reiniciar() {
+  clicks = 0;
+  const btn = document.getElementById('btn-nao');
+  btn.style.position = 'static';
+  btn.style.left = '';
+  btn.style.top = '';
+  btn.style.margin = '';
+  btn.style.fontSize = '';
+  btn.style.padding = '';
+  btn.textContent = 'NÃO 🙅';
+
+  document.getElementById('msg-final').classList.remove('show');
+  document.getElementById('btn-reiniciar').classList.remove('show');
+  document.getElementById('tela-coracao').classList.remove('show');
+  document.getElementById('tela-pergunta').style.display = '';
+}
+</script>
+</body>
+</html>
